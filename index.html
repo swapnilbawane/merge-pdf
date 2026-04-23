@@ -1,114 +1,317 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDF Stitcher (Offline)</title>
 
 <style>
-body {
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    margin: 0;
-    background: #0f172a;
-    color: #e2e8f0;
-}
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+.pg{font-family:'Geist',sans-serif;background:#080c14;color:#b8c4d8;min-height:100vh;padding-bottom:80px;overflow-x:hidden}
+.glow1{position:fixed;top:-160px;left:50%;transform:translateX(-50%);width:700px;height:500px;background:radial-gradient(ellipse,rgba(99,179,237,.1) 0%,transparent 68%);pointer-events:none;z-index:0}
+.glow2{position:fixed;bottom:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(ellipse,rgba(139,92,246,.07) 0%,transparent 70%);pointer-events:none;z-index:0}
+.rel{position:relative;z-index:1}
 
-.container {
-    max-width: 900px;
-    margin: auto;
-    padding: 40px 20px;
-}
+/* nav */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:0.5px solid rgba(184,196,216,.08)}
+.nav-logo{font-family:'Geist Mono',monospace;font-size:13px;color:#63b3ed;letter-spacing:.06em}
+.nav-link{font-size:13px;color:#6b7fa3;text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s}
+.nav-link:hover{color:#e2eaf7}
+.nav-link svg{width:14px;height:14px;fill:currentColor}
 
-h1 {
-    font-size: 42px;
-    margin-bottom: 10px;
-}
+/* hero */
+.hero{text-align:center;padding:72px 24px 0;max-width:800px;margin:0 auto}
+.badge{display:inline-flex;align-items:center;gap:7px;border:0.5px solid rgba(99,179,237,.3);border-radius:100px;padding:5px 14px;font-size:11.5px;font-family:'Geist Mono',monospace;color:#63b3ed;letter-spacing:.07em;margin-bottom:32px;background:rgba(99,179,237,.06)}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:#63b3ed;animation:blink 2.2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.hero h1{font-family:'Instrument Serif',serif;font-size:clamp(52px,9vw,88px);font-weight:400;line-height:1.0;color:#eef2fc;letter-spacing:-.03em;margin-bottom:0}
+.hero h1 i{color:#63b3ed;font-style:italic}
+.tagline{font-size:16px;font-weight:300;color:#6b7fa3;margin:22px auto 0;max-width:460px;line-height:1.7}
+.tagline strong{color:#a0b4cc;font-weight:400}
 
-h2 {
-    margin-top: 40px;
-    color: #38bdf8;
-}
+/* buttons */
+.btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:32px}
+.btn-p{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:#63b3ed;color:#080c14;border-radius:8px;font-weight:500;font-size:13.5px;text-decoration:none;transition:background .2s,transform .15s;border:none;cursor:pointer}
+.btn-p:hover{background:#90cdf4;transform:translateY(-1px)}
+.btn-g{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:transparent;color:#a0b4cc;border:0.5px solid rgba(160,180,204,.22);border-radius:8px;font-size:13.5px;text-decoration:none;transition:border-color .2s,transform .15s;cursor:pointer}
+.btn-g:hover{border-color:rgba(160,180,204,.5);transform:translateY(-1px)}
 
-p {
-    line-height: 1.6;
-    color: #cbd5f5;
-}
+/* mockup */
+.mockup-wrap{margin:48px auto 0;max-width:680px;padding:0 24px}
+.mockup{background:#0d1220;border:0.5px solid rgba(99,179,237,.18);border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.4),0 40px 80px rgba(0,0,0,.5)}
+.mockup-bar{display:flex;align-items:center;gap:7px;padding:12px 16px;border-bottom:0.5px solid rgba(184,196,216,.08);background:#0a0f1b}
+.mockup-dot{width:8px;height:8px;border-radius:50%}
+.mockup-title{font-family:'Geist Mono',monospace;font-size:10px;color:#3d5070;margin:0 auto}
+.mockup-body{padding:20px}
+.drop-zone{border:0.5px dashed rgba(99,179,237,.35);border-radius:10px;padding:24px 20px;text-align:center;background:rgba(99,179,237,.03);margin-bottom:16px;cursor:pointer;transition:border-color .2s}
+.drop-zone:hover{border-color:rgba(99,179,237,.6)}
+.drop-icon{width:32px;height:32px;border-radius:8px;background:rgba(99,179,237,.12);display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.drop-icon svg{width:16px;height:16px;stroke:#63b3ed;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.drop-label{font-size:12px;color:#4a5e7a;font-family:'Geist Mono',monospace}
+.drop-label span{color:#63b3ed}
+.file-list{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.file-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:#111827;border:0.5px solid rgba(184,196,216,.08);border-radius:8px}
+.file-icon{flex-shrink:0;width:26px;height:26px;border-radius:6px;background:rgba(99,179,237,.1);display:flex;align-items:center;justify-content:center}
+.file-icon svg{width:13px;height:13px;stroke:#63b3ed;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.file-name{font-size:12px;color:#c5d2e8;flex:1;font-family:'Geist Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-size{font-size:10px;color:#3d5070;font-family:'Geist Mono',monospace;margin-right:8px}
+.file-actions{display:flex;gap:4px}
+.fa-btn{width:20px;height:20px;border-radius:4px;background:transparent;border:0.5px solid rgba(184,196,216,.1);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.fa-btn svg{width:10px;height:10px;stroke:#4a5e7a;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.merge-row{display:flex;gap:8px;align-items:center}
+.filename-input{flex:1;background:#111827;border:0.5px solid rgba(184,196,216,.12);border-radius:7px;padding:9px 12px;font-family:'Geist Mono',monospace;font-size:11px;color:#63b3ed;outline:none}
+.merge-btn{padding:9px 18px;background:#63b3ed;color:#080c14;border-radius:7px;font-weight:500;font-size:12px;border:none;cursor:pointer;white-space:nowrap}
 
-.hero {
-    text-align: center;
-    padding: 80px 20px;
-}
+/* stats row */
+.stats{display:flex;gap:0;max-width:680px;margin:36px auto 0;padding:0 24px}
+.stat{flex:1;text-align:center;padding:20px 12px;border:0.5px solid rgba(184,196,216,.08);background:rgba(255,255,255,.015)}
+.stat:first-child{border-radius:10px 0 0 10px}
+.stat:last-child{border-radius:0 10px 10px 0}
+.stat:not(:last-child){border-right:none}
+.stat-n{font-family:'Instrument Serif',serif;font-size:28px;color:#eef2fc;line-height:1}
+.stat-l{font-size:11px;color:#4a5e7a;margin-top:6px;font-family:'Geist Mono',monospace;letter-spacing:.04em}
 
-.button {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 12px 20px;
-    background: #38bdf8;
-    color: black;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: bold;
-}
+/* divider */
+.div{max-width:680px;margin:56px auto 0 ;padding:0 24px}
+.div-line{border:none;border-top:0.5px solid rgba(184,196,216,.08)}
 
-.feature {
-    margin-bottom: 15px;
-}
+/* sections */
+.sec{max-width:680px;margin:0 auto;padding:56px 24px 0}
+.sec-tag{font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:#3d5070;text-transform:uppercase;margin-bottom:20px}
+.sec-h{font-family:'Instrument Serif',serif;font-size:34px;font-weight:400;color:#eef2fc;line-height:1.15;margin-bottom:14px;letter-spacing:-.02em}
+.sec-h i{color:#63b3ed;font-style:italic}
+.sec-p{font-size:14.5px;color:#6b7fa3;line-height:1.75;max-width:520px}
 
-.footer {
-    text-align: center;
-    margin-top: 60px;
-    font-size: 14px;
-    color: #64748b;
-}
+/* use cases */
+.usecases{display:flex;flex-direction:column;gap:0;margin-top:28px;border:0.5px solid rgba(184,196,216,.08);border-radius:12px;overflow:hidden}
+.uc{display:flex;align-items:flex-start;gap:16px;padding:18px 20px;border-bottom:0.5px solid rgba(184,196,216,.06);transition:background .2s}
+.uc:last-child{border-bottom:none}
+.uc:hover{background:rgba(99,179,237,.04)}
+.uc-num{font-family:'Geist Mono',monospace;font-size:11px;color:#3d5070;padding-top:1px;min-width:20px}
+.uc-content h3{font-size:13.5px;font-weight:500;color:#c5d2e8;margin-bottom:4px}
+.uc-content p{font-size:12.5px;color:#4a5e7a;line-height:1.55}
+
+/* features grid */
+.feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px;margin-top:28px}
+.feat{padding:16px;background:rgba(255,255,255,.02);border:0.5px solid rgba(184,196,216,.08);border-radius:10px;transition:border-color .2s,background .2s}
+.feat:hover{border-color:rgba(99,179,237,.25);background:rgba(99,179,237,.04)}
+.feat-dot{width:6px;height:6px;border-radius:50%;background:#63b3ed;margin-bottom:10px;opacity:.7}
+.feat h3{font-size:12.5px;font-weight:500;color:#c5d2e8;margin-bottom:4px}
+.feat p{font-size:11.5px;color:#4a5e7a;line-height:1.5}
+
+/* steps */
+.steps{margin-top:32px;display:flex;flex-direction:column}
+.step{display:flex;gap:18px;padding-bottom:28px;position:relative}
+.step:last-child{padding-bottom:0}
+.step-n{flex-shrink:0;width:28px;height:28px;border-radius:50%;border:0.5px solid rgba(99,179,237,.35);display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',monospace;font-size:11px;color:#63b3ed;background:#080c14;z-index:1;margin-top:1px}
+.step-line{position:absolute;left:13px;top:28px;bottom:0;width:0.5px;background:rgba(99,179,237,.1)}
+.step:last-child .step-line{display:none}
+.step-b h3{font-size:13.5px;font-weight:500;color:#c5d2e8;margin-bottom:5px;padding-top:3px}
+.step-b p{font-size:12.5px;color:#4a5e7a;line-height:1.6}
+.step-b code{font-family:'Geist Mono',monospace;font-size:11.5px;background:rgba(99,179,237,.09);color:#90cdf4;padding:2px 7px;border-radius:4px}
+
+/* future */
+.future-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:28px}
+.future-item{display:flex;align-items:center;gap:10px;padding:13px 14px;background:rgba(255,255,255,.02);border:0.5px solid rgba(184,196,216,.07);border-radius:8px;font-size:12.5px;color:#4a5e7a}
+.future-item .f-icon{width:20px;height:20px;border-radius:5px;background:rgba(139,92,246,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.future-item .f-icon svg{width:11px;height:11px;stroke:#a78bfa;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* cta */
+.cta{max-width:680px;margin:56px auto 0;padding:0 24px}
+.cta-box{border:0.5px solid rgba(99,179,237,.2);border-radius:16px;padding:52px 40px;text-align:center;background:rgba(99,179,237,.04);position:relative;overflow:hidden}
+.cta-glow{position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:300px;height:200px;background:radial-gradient(ellipse,rgba(99,179,237,.15) 0%,transparent 70%);pointer-events:none}
+.cta-box h2{font-family:'Instrument Serif',serif;font-size:32px;font-weight:400;color:#eef2fc;margin-bottom:10px;position:relative}
+.cta-box p{font-size:13.5px;color:#4a5e7a;margin-bottom:28px;position:relative}
+.cta-box .btns{position:relative}
+
+/* footer */
+.footer{text-align:center;margin-top:60px;font-size:11px;color:#2a3650;font-family:'Geist Mono',monospace;letter-spacing:.04em}
 </style>
-</head>
 
-<body>
+<div class="pg">
+  <div class="glow1"></div>
+  <div class="glow2"></div>
+  <div class="rel">
 
-<div class="hero">
-    <h1>📄 PDF Stitcher</h1>
-    <p>Merge PDFs offline. Fast, simple, and privacy-first.</p>
+    <nav class="nav">
+      <span class="nav-logo">pdf-stitcher</span>
+      <a href="https://github.com/swapnilbawane/pdf-offline" class="nav-link">
+        <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
+      </a>
+    </nav>
 
-    <a href="https://github.com/swapnilbawane/pdf-offline" class="button">View on GitHub</a>
-</div>
-
-<div class="container">
-
-    <h2>🧠 Why this exists</h2>
-    <p>
-        Most PDF tools require uploading documents online. That doesn’t work when files are sensitive.
-    </p>
-    <p>
-        This tool runs completely offline, in your browser, giving you full control.
-    </p>
-
-    <h2>🚀 What it does</h2>
-
-    <div class="feature">✔ Add PDFs in multiple batches</div>
-    <div class="feature">✔ Drag & drop files</div>
-    <div class="feature">✔ Reorder before merging</div>
-    <div class="feature">✔ Remove unwanted files</div>
-    <div class="feature">✔ Custom output filename</div>
-    <div class="feature">✔ One-click reset</div>
-    <div class="feature">✔ Fully offline (no uploads)</div>
-
-    <h2>⚙️ How it works</h2>
-    <p>
-        Built using Python (Flask) and pypdf, with a lightweight browser interface.
-    </p>
-
-    <h2>▶️ Get started</h2>
-    <p>
-        Clone the repository, run the app locally, and start merging PDFs instantly.
-    </p>
-
-    <a href="YOUR_GITHUB_LINK_HERE" class="button">Go to Repository</a>
-
-    <div class="footer">
-        Built for real-world usage. Simple tools, done right.
+    <div class="hero">
+      <div class="badge"><span class="badge-dot"></span> runs entirely offline</div>
+      <h1>Merge PDFs.<br><i>Privately.</i></h1>
+      <p class="tagline">No uploads. No accounts. No cloud.<br><strong>Your files never leave your machine.</strong></p>
+      <div class="btns">
+        <a href="https://github.com/swapnilbawane/pdf-offline" class="btn-p">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          Clone on GitHub
+        </a>
+        <a href="#how" class="btn-g">See how it works ↓</a>
+      </div>
     </div>
 
-</div>
+    <!-- UI Mockup -->
+    <div class="mockup-wrap">
+      <div class="mockup">
+        <div class="mockup-bar">
+          <div class="mockup-dot" style="background:#ff5f57"></div>
+          <div class="mockup-dot" style="background:#febc2e"></div>
+          <div class="mockup-dot" style="background:#28c840"></div>
+          <span class="mockup-title">PDF Stitcher — localhost:5000</span>
+        </div>
+        <div class="mockup-body">
+          <div class="drop-zone">
+            <div class="drop-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="drop-label"><span>Click to add PDFs</span> or drag & drop here</div>
+          </div>
+          <div class="file-list">
+            <div class="file-row">
+              <div class="file-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+              <span class="file-name">Q3_financial_report.pdf</span>
+              <span class="file-size">2.4 MB</span>
+              <div class="file-actions">
+                <div class="fa-btn"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg></div>
+                <div class="fa-btn"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+                <div class="fa-btn"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+              </div>
+            </div>
+            <div class="file-row">
+              <div class="file-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+              <span class="file-name">invoice_oct_2024.pdf</span>
+              <span class="file-size">840 KB</span>
+              <div class="file-actions">
+                <div class="fa-btn"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg></div>
+                <div class="fa-btn"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+                <div class="fa-btn"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+              </div>
+            </div>
+            <div class="file-row">
+              <div class="file-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+              <span class="file-name">annex_signatures.pdf</span>
+              <span class="file-size">1.1 MB</span>
+              <div class="file-actions">
+                <div class="fa-btn"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg></div>
+                <div class="fa-btn"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+                <div class="fa-btn"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+              </div>
+            </div>
+          </div>
+          <div class="merge-row">
+            <input class="filename-input" value="merged_output" readonly>
+            <button class="merge-btn">Merge & Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-</body>
-</html>
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat"><div class="stat-n">100%</div><div class="stat-l">offline</div></div>
+      <div class="stat"><div class="stat-n">0</div><div class="stat-l">uploads</div></div>
+      <div class="stat"><div class="stat-n">2</div><div class="stat-l">dependencies</div></div>
+      <div class="stat"><div class="stat-n">&lt;1 min</div><div class="stat-l">setup time</div></div>
+    </div>
+
+    <div class="div"><hr class="div-line"></div>
+
+    <!-- Why -->
+    <div class="sec">
+      <div class="sec-tag">// the problem</div>
+      <h2 class="sec-h">Online PDF tools ask you<br>to <i>trust a stranger</i> with your files</h2>
+      <p class="sec-p">Contracts, invoices, medical records, legal documents — these aren't files you should be uploading to a random server. PDF Stitcher runs entirely on your machine using Python and Flask. The processing happens locally, and nothing is ever transmitted.</p>
+    </div>
+
+    <!-- Use cases -->
+    <div class="sec">
+      <div class="sec-tag">// built for</div>
+      <h2 class="sec-h">Real workflows,<br>real documents</h2>
+      <div class="usecases">
+        <div class="uc">
+          <span class="uc-num">01</span>
+          <div class="uc-content"><h3>Financial reporting</h3><p>Combine quarterly statements, invoices, and audit docs without exposing them to third parties.</p></div>
+        </div>
+        <div class="uc">
+          <span class="uc-num">02</span>
+          <div class="uc-content"><h3>Legal & administrative</h3><p>Stitch contracts, annexes, and signature pages for clean submission packets.</p></div>
+        </div>
+        <div class="uc">
+          <span class="uc-num">03</span>
+          <div class="uc-content"><h3>Medical records</h3><p>Merge prescriptions, lab results, and reports safely — no HIPAA anxiety.</p></div>
+        </div>
+        <div class="uc">
+          <span class="uc-num">04</span>
+          <div class="uc-content"><h3>Academic & alumni work</h3><p>Assemble applications, transcripts, and supporting documents in the right order.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="sec">
+      <div class="sec-tag">// features</div>
+      <h2 class="sec-h">Simple by design</h2>
+      <div class="feats">
+        <div class="feat"><div class="feat-dot"></div><h3>Drag & drop</h3><p>Drop files straight into the browser — no file picker required.</p></div>
+        <div class="feat"><div class="feat-dot"></div><h3>Add in batches</h3><p>Start with three files, add more later. No need to select everything upfront.</p></div>
+        <div class="feat"><div class="feat-dot"></div><h3>Reorder freely</h3><p>Move files up or down until the sequence is exactly right.</p></div>
+        <div class="feat"><div class="feat-dot"></div><h3>Remove files</h3><p>Changed your mind? Remove any file before hitting merge.</p></div>
+        <div class="feat"><div class="feat-dot"></div><h3>Custom filename</h3><p>Name the output before downloading — not "merged_1732894.pdf".</p></div>
+        <div class="feat"><div class="feat-dot"></div><h3>One-click reset</h3><p>Clear the queue instantly and start fresh without reloading the page.</p></div>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <div class="sec" id="how">
+      <div class="sec-tag">// get started</div>
+      <h2 class="sec-h">Running in<br><i>under a minute</i></h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-n">1</div><div class="step-line"></div>
+          <div class="step-b"><h3>Clone the repo</h3><p><code>git clone https://github.com/swapnilbawane/pdf-offline</code></p></div>
+        </div>
+        <div class="step">
+          <div class="step-n">2</div><div class="step-line"></div>
+          <div class="step-b"><h3>Install dependencies</h3><p><code>pip install flask pypdf</code> — two packages, nothing else.</p></div>
+        </div>
+        <div class="step">
+          <div class="step-n">3</div><div class="step-line"></div>
+          <div class="step-b"><h3>Start the local server</h3><p>Run <code>python app.py</code> — the browser opens at <code>localhost:5000</code> automatically.</p></div>
+        </div>
+        <div class="step">
+          <div class="step-n">4</div><div class="step-line"></div>
+          <div class="step-b"><h3>Merge your PDFs</h3><p>Add files, reorder if needed, name the output, download. That's the whole workflow.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coming soon -->
+    <div class="sec">
+      <div class="sec-tag">// coming soon</div>
+      <h2 class="sec-h">What's next</h2>
+      <div class="future-grid">
+        <div class="future-item"><div class="f-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg></div>Page count per file</div>
+        <div class="future-item"><div class="f-icon"><svg viewBox="0 0 24 24"><polyline points="5 9 2 12 5 15"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div>Drag-to-reorder UI</div>
+        <div class="future-item"><div class="f-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>Standalone desktop app</div>
+        <div class="future-item"><div class="f-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>Remember last filename</div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta">
+      <div class="cta-box">
+        <div class="cta-glow"></div>
+        <h2>Ready to stitch?</h2>
+        <p>Open source. No sign-up. No uploads. Just clone and run.</p>
+        <div class="btns">
+          <a href="https://github.com/swapnilbawane/pdf-offline" class="btn-p">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer" style="margin-top:48px">built by swapnilbawane &nbsp;·&nbsp; open source &nbsp;·&nbsp; privacy-first</div>
+
+  </div>
+</div>
